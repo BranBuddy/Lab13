@@ -1,3 +1,11 @@
+/**
+   Written by Brandon Wahl
+
+   This script grabs weather data from OpenWeather API based on latitude and longitude coordinates. In the JSON file provided, the script grabs data from 
+   a variety of fields including weather conditions, sunrise/sunset times, and city name. Based on this data, the script updates the skybox material to reflect
+   current weather and time of day in the specified city.
+**/
+
 using System;
 using System.Collections;
 using UnityEngine;
@@ -34,7 +42,7 @@ public class WeatherManager : MonoBehaviour {
    [SerializeField] private TMP_Text cityText;
    [SerializeField] private TMP_Text cityWeather;
 
-   //City Coordinates inputable via inspector
+   //City Coordinates inputable via inspector, however they will change depending on which city button is clicked
    [SerializeField] internal string longitude;
    [SerializeField] internal string latitude;
 
@@ -207,6 +215,7 @@ public class WeatherManager : MonoBehaviour {
             }
             catch (Exception ex)
             {
+               //If the parsing fails, it throws an error
                Debug.LogError($"Failed parsing JSON with JsonUtility: {ex.Message}");
             }
 
@@ -240,22 +249,22 @@ public class WeatherManager : MonoBehaviour {
          return hour >= startInclusive || hour < endExclusive;
       }
 
-      // First handle strong weather overrides (rain, drizzle, thunderstorm, snow)
+      // The keys below are based on OpenWeather "main" values that would override time-based skyboxes like sunrise/sunset
       if (key == "rain") chosen = skyboxRain;
       else if (key == "drizzle") chosen = skyboxDrizzle;
       else if (key == "thunderstorm") chosen = skyboxThunderstorm;
       else if (key == "snow") chosen = skyboxSnow;
       else if (key == "clear" || key == "clouds")
       {
-
+         //Assigns new variable to the current city time
          int now = cityTimeOnly;
 
-         // If sunrise/sunset not available, fall back to day/night using local machine time
+         // If sunrise/sunset not available, use local machine time
          bool haveSunTimes = sunriseHour != 0 || sunsetHour != 0;
 
          if (!haveSunTimes)
          {
-            // fallback: use system local hour
+            // if there is no data for sunrise/sunset, use system local hour
             now = DateTime.Now.Hour;
          }
 
