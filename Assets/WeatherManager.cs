@@ -240,13 +240,14 @@ public class WeatherManager : MonoBehaviour {
       string key = main.Trim().ToLowerInvariant();
       Material chosen = null;
 
-      // Helper: check if hour is between start (inclusive) and end (exclusive), handling midnight wrap
-      bool HourBetween(int hour, int startInclusive, int endExclusive)
+      // Checks if the desired hour is between the start and end of the night cycle. 
+      // For example if sunset is 8pm and sunrise is 6am the next day, night would fall between 8pm-6am
+      bool HourBetween(int hour, int startOfNight, int endOfNight)
       {
-         if (startInclusive <= endExclusive)
-            return hour >= startInclusive && hour < endExclusive;
-         // wraps midnight, e.g. start=20, end=6
-         return hour >= startInclusive || hour < endExclusive;
+         if (startOfNight <= endOfNight)
+            return hour >= startOfNight && hour < endOfNight;
+         
+         return hour >= startOfNight || hour < endOfNight;
       }
 
       // The keys below are based on OpenWeather "main" values that would override time-based skyboxes like sunrise/sunset
@@ -293,6 +294,7 @@ public class WeatherManager : MonoBehaviour {
          chosen = skyboxDefault;
       }
 
+      //Below will update the skybox if a material was chosen
       if (chosen != null)
       {
          RenderSettings.skybox = chosen;
